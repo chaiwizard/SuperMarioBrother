@@ -1,19 +1,19 @@
 #include "Player.h"
 
 Player::Player()
-	:desiredPosition(0,0),velocity(0,0),onGround(false),forwardMarch(false),mightAsWellJump(false)
+	:velocity(0,0),m_onGround(false),desiredPosition(0,0),
+	forwardMarch(false),mightAswellJump(false)
 {
-	
 }
 
 Player::~Player()
 {
 }
 
-Player* Player::create(std::string name)
+Player* Player::create(std::string filename)
 {
 	Player* ret = new Player();
-	if(ret && ret->initWithFile(name)){
+	if(ret && ret->initWithFile(filename)){
 		ret->autorelease();
 		return ret;
 	}else{
@@ -21,61 +21,56 @@ Player* Player::create(std::string name)
 		ret = NULL;
 	}
 
-	return NULL;
+	return ret;
 }
 
 #define CLAMP(x,min,max) MAX(min,MIN(x,max))
 
 void Player::update(float dt)
 {
-	Point gravity(0,-450);
+	Point gravity(0,-450);//g=9.8
 	Point gravityStep = gravity * dt;
 
-
-	Point forwardMove(800,0);
-	Point forwardMoveStep = forwardMove * dt;
-
-	if(!onGround){
+	if(!m_onGround){
 		velocity = velocity + gravityStep;
 	}
 
+	Point forwardMove(800,0);
+	Point forwardStep = forwardMove * dt;
+
 	velocity = Point(velocity.x * 0.9, velocity.y);
 
-	Point jumpForce(0.0, 400.0);
-	float jumpCutoff = 200.0;
- 
-	if (mightAsWellJump && onGround) {
+	if(forwardMarch){
+		velocity += forwardStep;
+	}
+
+	Point jumpForce(0,310);
+	int jumpCutoff = 150;
+
+	if(mightAswellJump && m_onGround){
 		velocity = velocity + jumpForce;
-	} else if (!mightAsWellJump &&  (velocity.y > jumpCutoff) ){
+	}else if( !mightAswellJump && (velocity.x > jumpCutoff)){
 		velocity = Point(velocity.x, jumpCutoff);
 	}
-	
-
-	if(forwardMarch){
-		velocity += forwardMoveStep;
-	}
 
 
-	Point minMovement = Point(0,-450);
-	Point maxMovement = Point(120,300);
+	velocity = Point(CLAMP(velocity.x,0,120),
+		CLAMP(velocity.y,-450,300));
 
-	velocity = Point(CLAMP(velocity.x,minMovement.x,maxMovement.x),
-		CLAMP(velocity.y,minMovement.y,maxMovement.y));
+	Point step = velocity * dt;
 
-	Point velocityStep = velocity * dt;
-
-	desiredPosition = getPosition() + velocityStep;
+	desiredPosition = getPosition() + step;
 }
 
 Rect Player::collisionBoundingBox()
 {
 	Rect rect = getBoundingBox();
 
-	Rect bounding(rect.origin.x+2,rect.origin.y,
-		rect.size.width-4,rect.size.height);
+	Rect smallBox(rect.origin.x+2,rect.origin.y,
+		rect.size.width - 4,rect.size.height);
 
-	//Point diff = desiredPosition-getPosition();
-	Point diff = ccpSub(desiredPosition,getPosition());
-	return Rect(bounding.origin.x+diff.x,bounding.origin.y+diff.y,
-		bounding.size.width,bounding.size.height);
+	Point diff = desiredPosition - getPosition();
+
+	return Rect(smallBox.origin.x + diff.x, smallBox.origin.y + diff.y,
+		smallBox.size.width,smallBox.size.height);
 }

@@ -6,39 +6,36 @@
 
 using namespace cocos2d;
 
-class GameLayer : public LayerColor {
+class GameLayer : LayerColor {
 public:
-	
 	static Scene* createScene();
 
 	CREATE_FUNC(GameLayer);
-	
 	bool init();
 
 	void update(float dt);
 
 	void checkForAndResolveCollisionsForPlayer();
-	void handleHazardCollisions();
+	void handleHazardsCollisions();
 
-	void onTouchesBegan(const std::vector<Touch*>& touches, Event *event); 
-    void onTouchesMoved(const std::vector<Touch*>& touches, Event *event); 
-    void onTouchesEnded(const std::vector<Touch*>& touches, Event *event); 
+	void onTouchesBegan(const std::vector<Touch*>& touches, Event *event);
+    void onTouchesMoved(const std::vector<Touch*>& touches, Event *event);
+    void onTouchesEnded(const std::vector<Touch*>& touches, Event *event);
 
-	void gameOver(bool win);
-	void checkForWinning();
-
-	void replayCallback(Ref* pSender);
 
 private:
-
-	Rect tileRectFromTileCoords(Point tileCoords);
-	Point tileCoordForPosition(Point position);
-	void setViewPointCenter(Point position);
-
 	CCTMXTiledMap *m_map;
-	CCTMXLayer *m_background;
 	CCTMXLayer *m_walls;
 	CCTMXLayer *m_hazards;
+
+	void gameOver(bool win);
+	Point tileCoordForPosition(Point position);
+	Rect tileRectFromTileCoords(Point position);
+	void setViewPointCenter(Point pos);
+	void replayCallback(Ref* sender);
+	bool checkForSink(Point coord);
+	void checkForWin();
+
 
 	Player *m_player;
 	bool m_gameOver;

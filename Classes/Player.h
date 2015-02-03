@@ -2,6 +2,7 @@
 #define _PLAYER_H_
 
 #include "cocos2d.h"
+
 using namespace cocos2d;
 
 class Player : public Sprite{
@@ -12,45 +13,53 @@ public:
 	static Player* create(std::string filename);
 
 	void update(float dt);
-	Rect collisionBoundingBox();
 
-	Point getDesiredPosition() const 
-	{ 
-		return desiredPosition; 
-	}
-
-	void setDesiredPosition(Point inPos){
-		desiredPosition = inPos;
-	}
-
-	void setVelocity(Point vel) { 
-		velocity = vel; 
+	void setVelocity(Point value) {
+		velocity = value;
 	}
 
 	Point getVelocity() const {
 		return velocity;
 	}
 
-	void setOnGround(bool status) { 
-		onGround = status; 
+	void setOnGround(bool value){
+		m_onGround = value;
 	}
 
+	bool getOnGround() const {
+		return m_onGround;
+	}
+
+	void setDesiredPostion(Point pos)
+	{
+		desiredPosition = pos;	
+	}
+
+	Point getDesiredPosition() const {
+		return desiredPosition;
+	}
+
+	Rect collisionBoundingBox();
+
+	bool getForwardMarch() const { 
+		return forwardMarch;
+	}
 
 	void setForwardMarch(bool status){
 		forwardMarch = status;
 	}
 
 	void setJump(bool status){
-		mightAsWellJump = status;
+		mightAswellJump = status;
 	}
 
 private:
-	Point desiredPosition;
 	Point velocity;
-	bool onGround;
+	bool m_onGround;
+	Point desiredPosition;
 
 	bool forwardMarch;
-	bool mightAsWellJump;
+	bool mightAswellJump;
 };
 
 #endif
